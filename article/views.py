@@ -1,8 +1,13 @@
+from django.http import HttpResponse
 from rest_framework import generics
 
 from article.models import Article
 from article.serializers import ArticleListSerializer, ArticleDetailSerializer
 from article.permissions import IsAdminUserOrReadOnly
+
+
+def index(request):
+    return HttpResponse('Hello World!')
 
 
 class ArticleList(generics.ListCreateAPIView):
