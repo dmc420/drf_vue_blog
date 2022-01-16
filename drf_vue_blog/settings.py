@@ -129,19 +129,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/')
 CORS_ORIGIN_ALLOW_ALL = True  # 如果为True，将不使用白名单，并且将接受所有来源。默认为False。
 CORS_ALLOW_CREDENTIALS = True
 
-# 白名单
-CORS_ORIGIN_WHITELIST = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http：// localhost：8080",
-    "http://127.0.0.1:9000"
-]
-
-# 白名单也可使用正则
-CORS_ORIGIN_REGEX_WHITELIST = [
-    r"^https://\w+\.example\.com$",
-]
-
 # 默认为
 CORS_ALLOW_METHODS = [
     'DELETE',
