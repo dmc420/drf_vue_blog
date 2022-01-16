@@ -1,8 +1,8 @@
 from django.http import HttpResponse
-from rest_framework import generics
+from rest_framework import viewsets
 
 from article.models import Article
-from article.serializers import ArticleListSerializer, ArticleDetailSerializer
+from article.serializers import ArticleSerializer
 from article.permissions import IsAdminUserOrReadOnly
 
 
@@ -10,22 +10,10 @@ def index(request):
     return HttpResponse('Hello World!')
 
 
-class ArticleList(generics.ListCreateAPIView):
-    """
-    文章列表视图
-    """
+class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
-    serializer_class = ArticleListSerializer
+    serializer_class = ArticleSerializer
     permission_classes = [IsAdminUserOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
-
-class ArticleDetail(generics.RetrieveUpdateDestroyAPIView):
-    """
-    文章详情视图
-    """
-    queryset = Article.objects.all()
-    serializer_class = ArticleDetailSerializer
-    permission_classes = [IsAdminUserOrReadOnly]
