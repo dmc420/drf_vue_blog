@@ -36,7 +36,7 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-class ArticleSerializer(serializers.HyperlinkedModelSerializer):
+class ArticleBaseSerializer(serializers.HyperlinkedModelSerializer):
     author = UserDescSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     category_id = serializers.IntegerField(write_only=True,
@@ -60,6 +60,26 @@ class ArticleSerializer(serializers.HyperlinkedModelSerializer):
                 if not Tag.objects.filter(text=text).exists():
                     Tag.objects.create(text=text)
         return super().to_internal_value(data)
+
+
+class ArticleSerializer(ArticleBaseSerializer):
+    class Meta:
+        model = Article
+        fields = '__all__'
+        extra_kwargs = {'body': {'write_only': True}}
+
+
+class ArticleDetailSerializer(ArticleBaseSerializer):
+    body_html = serializers.SerializerMethodField()
+    toc_html = serializers.SerializerMethodField
+
+    @staticmethod
+    def get_body_html(obj):
+        return obj.get_md()[0]
+
+    @staticmethod
+    def get_toc_html(obj):
+        return obj.get_md()[1]
 
     class Meta:
         model = Article
