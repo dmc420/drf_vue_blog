@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from article.models import Article, Category, Tag
+from article.models import Article, Category, Tag, Avatar
 from user_info.serializers import UserDescSerializer
 
 
@@ -36,22 +36,62 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
+class AvatarSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name='avatar-detail')
+
+    class Meta:
+        model = Avatar
+        fields = '__all__'
+
+
 class ArticleBaseSerializer(serializers.HyperlinkedModelSerializer):
     author = UserDescSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
-    category_id = serializers.IntegerField(write_only=True,
-                                           allow_null=True,
-                                           required=False)
-    tags = serializers.SlugRelatedField(queryset=Tag.objects.all(),
-                                        many=True,
-                                        required=False,
-                                        slug_field='text')
+    category_id = serializers.IntegerField(
+        write_only=True,
+        allow_null=True,
+        required=False
+    )
+    tags = serializers.SlugRelatedField(
+        queryset=Tag.objects.all(),
+        many=True,
+        required=False,
+        slug_field='text'
+    )
+    avatar = AvatarSerializer(read_only=True)
+    avatar_id = serializers.IntegerField(
+        write_only=True,
+        allow_null=True,
+        required=False
+    )
 
-    @staticmethod
-    def validate_category_id(value):
-        if not Category.objects.filter(id=value).exists() and value is not None:
-            raise serializers.ValidationError('Category with id {} not exists.'.format(value))
+    # 自定义的错误信息
+    default_error_messages = {
+        'incorrect_avatar_id': 'Avatar with id {value} not exists.',
+        'incorrect_category_id': 'Category with id {value} not exists.',
+        'default': 'No more message here..'
+    }
+
+    def check_obj_exist_or_fail(self, model, value, message='default'):
+        if not self.default_error_messages.get(message, None):
+            message = 'default'
+        if not model.objects.filter(id=value).exists() and value is not None:
+            self.fail(message, value=value)
+
+    def validate_category_id(self, value):
+        self.check_obj_exist_or_fail(
+            model=Category,
+            value=value,
+            message='incorrect_category_id'
+        )
         return value
+
+    def validate_avatar_id(self, value):
+        self.check_obj_exist_or_fail(
+            model=Avatar,
+            value=value,
+            message='incorrect_avatar_id'
+        )
 
     def to_internal_value(self, data):
         tags_data = data.get('tags')

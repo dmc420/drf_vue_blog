@@ -1,10 +1,11 @@
 from django.http import HttpResponse
 from rest_framework import viewsets, filters
 
-from article.models import Article, Category, Tag
+from article.models import Article, Category, Tag, Avatar
 from article.serializers import (ArticleSerializer, ArticleDetailSerializer,
                                  CategorySerializer, CategoryDetailSerializer,
-                                 TagSerializer)
+                                 TagSerializer,
+                                 AvatarSerializer)
 from article.permissions import IsAdminUserOrReadOnly
 
 
@@ -52,3 +53,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
             return ArticleSerializer
         else:
             return ArticleDetailSerializer
+
+
+class AvatarViewSet(viewsets.ModelViewSet):
+    queryset = Avatar.objects.all()
+    serializer_class = AvatarSerializer
+    permission_classes = [IsAdminUserOrReadOnly]
