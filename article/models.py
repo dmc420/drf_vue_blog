@@ -17,9 +17,26 @@ class Category(models.Model):
         ordering = ['-created']
 
 
+class Tag(models.Model):
+    """
+    文章标签
+    """
+    text = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        ordering = ['-id']
+
+
 class Article(models.Model):
+    """
+    文章
+    """
     author = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='articles')
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL, related_name='article')
+    tags = models.ManyToManyField(Tag, blank=True, related_name='articles')
     title = models.CharField(max_length=100)
     body = models.TextField()
     created = models.DateTimeField(default=timezone.now)
