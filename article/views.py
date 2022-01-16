@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from rest_framework import viewsets, filters
 
-from article.models import Article
-from article.serializers import ArticleSerializer
+from article.models import Article, Category
+from article.serializers import ArticleSerializer, CategorySerializer, CategoryDetailSerializer
 from article.permissions import IsAdminUserOrReadOnly
 
 
@@ -10,7 +10,25 @@ def index(request):
     return HttpResponse('Hello World!')
 
 
+class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    分类视图集
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAdminUserOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return CategorySerializer
+        else:
+            return CategoryDetailSerializer
+
+
 class ArticleViewSet(viewsets.ModelViewSet):
+    """
+    文章视图集
+    """
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     permission_classes = [IsAdminUserOrReadOnly]
